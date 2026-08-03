@@ -22,16 +22,6 @@ class AuthService
             return null;
         }
 
-        if ($user->status !== 'validated') {
-            return null;
-        }
-
-        // Check if matricule is required
-        $matriculeRequired = in_array($user->user_type, ['agent', 'owner', 'admin'], true);
-        if ($matriculeRequired && !$user->matricule) {
-            return null;
-        }
-
         return $user;
     }
 
@@ -44,7 +34,7 @@ class AuthService
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
-            'phone' => $data['phone'],
+            'phone' => $data['phone'] ?? null,
             'password' => Hash::make($data['password']),
             'user_type' => $data['user_type'],
             'status' => 'validated',
@@ -54,25 +44,32 @@ class AuthService
         if ($user->user_type === 'owner') {
             $matricule = $this->generateOwnerMatricule();
             $user->update(['matricule' => $matricule]);
+            
             $user->ownerProfile()->create([
-                'owner_type' => 'individual',
+                'owner_type' => $data['owner_type'] ?? 'individual',
+                'company_name' => $data['company_name'] ?? null,
                 'is_active' => true,
                 'validation_status' => 'validated',
             ]);
-            Mail::to($user->email)->send(new MatriculeMail($user, $matricule));
+
+            try {
+                Mail::to($user->email)->send(new MatriculeMail($user, $matricule));
+            } catch (\Exception $e) {
+                \Log::warning('Could not send matricule email: ' . $e->getMessage());
+            }
         }
 
         return $user;
     }
 
     /**
-     * Generate unique owner matricule
+     * Generate unique owner matricule (Format: PROP-YYYY-XXXXXX)
      */
     public function generateOwnerMatricule(): string
     {
         $year = now()->format('Y');
-        $count = User::where('matricule', 'LIKE', "OWN-{$year}%")->count();
-        return "OWN-{$year}-" . str_pad($count + 1, 6, '0', STR_PAD_LEFT);
+        $count = User::where('matricule', 'LIKE', "PROP-{$year}%")->count();
+        return "PROP-{$year}-" . str_pad($count + 1, 6, '0', STR_PAD_LEFT);
     }
 
     /**

@@ -49,6 +49,7 @@ class Property extends Model
         'star_rating',
         'was_auto_validated',
         'photos',
+        'video_url',
         'amenities',
     ];
 

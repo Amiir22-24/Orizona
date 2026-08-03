@@ -48,6 +48,16 @@ class OccupancyRequest extends Model
         return $this->belongsTo(User::class, 'client_id');
     }
 
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function rejector()
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
+
     public function agent()
     {
         return $this->belongsTo(User::class, 'agent_id');

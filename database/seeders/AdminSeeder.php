@@ -25,7 +25,6 @@ class AdminSeeder extends Seeder
                 'avatar' => 'https://ui-avatars.com/api/?name=Admin&background=1e88e5&color=fff&size=128&bold=true',
                 'validation_notes' => 'Super Admin système',
                 'matricule' => 'ADMIN-001',
-                'is_admin' => true,
                 'updated_at' => now(),
             ]
         );

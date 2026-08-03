@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             OccupancySeeder::class,
             NotificationSeeder::class,
             ChatSeeder::class,
+            SubscriptionPlanSeeder::class,
             PaymentTransactionSeeder::class,
         ]);
 

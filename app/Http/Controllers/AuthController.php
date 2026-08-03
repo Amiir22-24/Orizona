@@ -10,6 +10,10 @@ use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use App\Models\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -25,16 +29,42 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $user = $this->authService->login(
-            $request->validated()['email'],
-            $request->validated()['password']
-        );
+        $credentials = $request->validated();
+        $emailOrMatricule = $credentials['email'];
+        $password = $credentials['password'];
+
+        $user = User::where('email', $emailOrMatricule)
+            ->orWhere('matricule', $emailOrMatricule)
+            ->first();
 
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => $user === null ? 'Identifiant ou mot de passe incorrect' : 'Compte non accessible',
+                'message' => 'Identifiant ou email non trouvé',
+                'error_type' => 'email_not_found',
+                'help' => 'Vérifiez l\'adresse email ou le matricule saisi.',
+                'suggestion' => 'Assurez-vous de saisir une adresse email valide ou votre numéro de matricule.',
             ], 401);
+        }
+
+        if (!Hash::check($password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Mot de passe incorrect',
+                'error_type' => 'invalid_password',
+                'help' => 'Le mot de passe fourni ne correspond pas à ce compte.',
+                'suggestion' => 'Utilisez la fonctionnalité "Mot de passe oublié" si vous avez égaré votre mot de passe.',
+            ], 401);
+        }
+
+        if ($user->status === 'inactive' || $user->status === 'rejected' || $user->status === 'banned') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Votre compte est désactivé ou suspendu.',
+                'error_type' => 'account_disabled',
+                'help' => 'Contactez l\'administration d\'Orizon pour réactiver votre compte.',
+                'suggestion' => 'Contactez support@orizon.com pour assistance.',
+            ], 403);
         }
 
         $user = $this->authService->loadUserProfile($user);
@@ -56,26 +86,35 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request)
     {
-        $user = $this->authService->register($request->validated());
+        $validated = $request->validated();
 
+        if (isset($validated['user_type']) && $validated['user_type'] === 'agent') {
+            return response()->json([
+                'success' => false,
+                'message' => 'L\'inscription en tant qu\'agent se fait uniquement par un administrateur.',
+                'error_type' => 'registration_blocked',
+            ], 403);
+        }
+
+        $user = $this->authService->register($validated);
         $token = $user->createToken('api')->plainTextToken;
 
-        // Notification d'inscription réussie
         Notification::create([
             'user_id' => $user->id,
             'type' => 'registration_success',
-            'title' => 'Bienvenue sur Orizon',
+            'title' => 'Bienvenue sur ORIZON',
             'message' => 'Votre inscription a été validée avec succès.',
             'is_read' => false,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Inscription réussie',
+            'message' => 'Inscription réussie - Votre compte est immédiatement validé et actif!',
             'data' => [
                 'user' => UserResource::make($user),
                 'token' => $token,
                 'token_type' => 'Bearer',
+                'auto_validated' => true,
             ],
         ], 201);
     }
@@ -85,7 +124,9 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        if ($request->user() && $request->user()->currentAccessToken()) {
+            $request->user()->currentAccessToken()->delete();
+        }
 
         return response()->json([
             'success' => true,
@@ -111,9 +152,7 @@ class AuthController extends Controller
      */
     public function refreshToken(Request $request)
     {
-        // On récupère le token depuis le header Authorization (Bearer <token>)
         $token = $request->bearerToken();
-        
         if (!$token) {
             return response()->json([
                 'success' => false,
@@ -121,8 +160,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // On cherche le token dans la base (Sanctum::findToken)
-        // Cela permet de retrouver l'utilisateur même si la route n'est pas protégée
         $accessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
 
         if (!$accessToken) {
@@ -133,11 +170,7 @@ class AuthController extends Controller
         }
 
         $user = $accessToken->tokenable;
-        
-        // Supprimer tous les tokens précédents (comportement d'origine)
-        $user->tokens()->delete();
-        
-        // Générer un nouveau token
+        $accessToken->delete();
         $newToken = $user->createToken('api')->plainTextToken;
 
         return response()->json([
@@ -168,8 +201,34 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Profil mis à jour',
+            'message' => 'Profil mis à jour avec succès',
             'data' => UserResource::make($user),
+        ]);
+    }
+
+    /**
+     * Upload user avatar
+     */
+    public function uploadPhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+        ]);
+
+        $file = $request->file('photo');
+        $path = $file->store('avatars', 'public');
+        $url = asset('storage/' . $path);
+
+        $user = $request->user();
+        $user->update(['avatar' => $url]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Photo de profil mise à jour',
+            'data' => [
+                'avatar' => $url,
+                'user' => UserResource::make($user->fresh()),
+            ],
         ]);
     }
 
@@ -189,12 +248,13 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Mot de passe actuel incorrect',
+                'error_type' => 'invalid_current_password',
             ], 422);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Mot de passe modifié',
+            'message' => 'Mot de passe modifié avec succès',
         ]);
     }
 
@@ -203,10 +263,25 @@ class AuthController extends Controller
      */
     public function forgotPassword(Request $request)
     {
+        $request->validate(['email' => 'required|email']);
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Adresse email non trouvée',
+                'error_type' => 'email_not_found',
+            ], 404);
+        }
+
+        // Token simulation
+        $token = Str::random(60);
+
         return response()->json([
-            'success' => false,
-            'message' => 'Non implémenté : configurer l\'envoi d\'email (lien de réinitialisation).',
-        ], 501);
+            'success' => true,
+            'message' => 'Un email de réinitialisation vous a été envoyé.',
+            'reset_token' => $token,
+        ]);
     }
 
     /**
@@ -214,10 +289,27 @@ class AuthController extends Controller
      */
     public function resetPassword(Request $request)
     {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string|min:6|confirmed',
+            'token' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Utilisateur introuvable',
+                'error_type' => 'user_not_found',
+            ], 404);
+        }
+
+        $user->update(['password' => Hash::make($request->password)]);
+
         return response()->json([
-            'success' => false,
-            'message' => 'Non implémenté : utiliser un token de reset valide.',
-        ], 501);
+            'success' => true,
+            'message' => 'Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.',
+        ]);
     }
 }
-

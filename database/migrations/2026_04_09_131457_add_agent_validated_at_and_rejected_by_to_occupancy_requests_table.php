@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration {
     /**
      * Run the migrations.
+     *
+     * MySQL: MODIFY COLUMN pour changer le type de status
      */
     public function up(): void
     {
@@ -21,9 +23,8 @@ return new class extends Migration {
             }
         });
 
-        // Correction de la colonne status pour Postgres
-        DB::statement("ALTER TABLE occupancy_requests ALTER COLUMN status TYPE VARCHAR(255)");
-        DB::statement("ALTER TABLE occupancy_requests ALTER COLUMN status SET DEFAULT 'pending'");
+        // MySQL: changer ENUM en VARCHAR pour plus de flexibilité
+        DB::statement("ALTER TABLE occupancy_requests MODIFY COLUMN status VARCHAR(50) NOT NULL DEFAULT 'pending'");
     }
 
     /**
@@ -36,6 +37,6 @@ return new class extends Migration {
             $table->dropColumn(['agent_validated_at', 'rejected_by']);
         });
 
-        DB::statement("ALTER TABLE occupancy_requests MODIFY COLUMN status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending'");
+        DB::statement("ALTER TABLE occupancy_requests MODIFY COLUMN status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending'");
     }
 };

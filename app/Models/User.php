@@ -19,6 +19,7 @@ class User extends Authenticatable
         'last_name',
         'email',
         'phone',
+        'whatsapp',
         'password',
         'user_type',
         'status',
@@ -191,9 +192,14 @@ class User extends Authenticatable
         return $this->status === 'validated';
     }
 
-    public function properties()
+    public function withdrawals()
     {
-        return $this->propertiesAsOwner()->or($this->propertiesAsAgent());
+        return $this->hasMany(Withdrawal::class);
     }
 
+    public function properties()
+    {
+        return Property::where('owner_id', $this->id)->orWhere('agent_id', $this->id);
+    }
 }
+

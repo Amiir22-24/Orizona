@@ -10,7 +10,6 @@ class PropertySeeder extends Seeder
     public function run(): void
     {
         $properties = [
-            // Property 1 - Owner 3, Rent, Validated
             [
                 'id' => 1,
                 'title' => 'Appartement 3 chambres Cocody',
@@ -48,10 +47,7 @@ class PropertySeeder extends Seeder
                 'occupied_at' => now()->subDays(1),
                 'status' => 'validated',
                 'was_auto_validated' => false,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
-            // Property 2
             [
                 'id' => 2,
                 'title' => 'Villa 4 chambres Marcory',
@@ -86,10 +82,7 @@ class PropertySeeder extends Seeder
                 'is_occupied' => false,
                 'status' => 'pending',
                 'was_auto_validated' => false,
-                'created_at' => now()->subDays(2),
-                'updated_at' => now(),
             ],
-            // Property 3
             [
                 'id' => 3,
                 'title' => 'Studio Treichville',
@@ -125,10 +118,7 @@ class PropertySeeder extends Seeder
                 'status' => 'rejected',
                 'was_auto_validated' => false,
                 'rejection_reason' => 'Photos insuffisantes',
-                'created_at' => now()->subDays(7),
-                'updated_at' => now(),
             ],
-            // Property 4
             [
                 'id' => 4,
                 'title' => 'Bureau Zone 4',
@@ -163,10 +153,7 @@ class PropertySeeder extends Seeder
                 'is_occupied' => false,
                 'status' => 'validated',
                 'was_auto_validated' => false,
-                'created_at' => now()->subDays(15),
-                'updated_at' => now(),
             ],
-            // Property 5
             [
                 'id' => 5,
                 'title' => 'Terrain constructible Bingerville',
@@ -201,15 +188,17 @@ class PropertySeeder extends Seeder
                 'is_occupied' => false,
                 'status' => 'pending',
                 'was_auto_validated' => false,
-                'created_at' => now()->subDays(3),
-                'updated_at' => now(),
             ],
         ];
 
         foreach ($properties as $property) {
-            DB::table('properties')->updateOrInsert($property);
+            $data = $property;
+            $data['created_at'] = now();
+            $data['updated_at'] = now();
+            DB::table('properties')->updateOrInsert(['id' => $property['id']], $data);
         }
 
         echo "✅ 5 propriétés créées (IDs 1-5) pour toutes sections\n";
     }
 }
+

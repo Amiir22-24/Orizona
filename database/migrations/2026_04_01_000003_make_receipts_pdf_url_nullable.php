@@ -3,16 +3,18 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
     /**
      * Run the migrations.
+     *
+     * MySQL: utiliser change() pour rendre la colonne nullable
      */
     public function up(): void
     {
-        // Syntaxe PostgreSQL pour autoriser les valeurs NULL
-        DB::statement("ALTER TABLE receipts ALTER COLUMN pdf_url DROP NOT NULL");
+        Schema::table('receipts', function (Blueprint $table) {
+            $table->string('pdf_url')->nullable()->change();
+        });
     }
 
     /**
@@ -20,7 +22,8 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        // Pour revenir en arrière et interdire le NULL
-        DB::statement("ALTER TABLE receipts ALTER COLUMN pdf_url SET NOT NULL");
+        Schema::table('receipts', function (Blueprint $table) {
+            $table->string('pdf_url')->nullable(false)->change();
+        });
     }
 };

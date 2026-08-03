@@ -8,12 +8,12 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration {
     /**
      * Run the migrations.
+     *
+     * MySQL: MODIFY COLUMN pour changer l'ENUM et ajouter 'land'
      */
     public function up(): void
     {
-        // Syntaxe PostgreSQL pour changer le type d'une colonne
-        DB::statement("ALTER TABLE properties ALTER COLUMN catalog_type TYPE VARCHAR(255)");
-        DB::statement("ALTER TABLE properties ALTER COLUMN catalog_type SET DEFAULT 'residential'");
+        DB::statement("ALTER TABLE properties MODIFY COLUMN catalog_type ENUM('residential', 'commercial', 'project', 'land') NOT NULL DEFAULT 'residential'");
     }
 
     /**
@@ -21,8 +21,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        // On peut soit laisser en VARCHAR, soit remettre une contrainte si nécessaire
-        DB::statement("ALTER TABLE properties ALTER COLUMN catalog_type TYPE VARCHAR(255)");
-        DB::statement("ALTER TABLE properties ALTER COLUMN catalog_type SET DEFAULT 'residential'");
+        DB::statement("ALTER TABLE properties MODIFY COLUMN catalog_type ENUM('residential', 'commercial', 'project') NOT NULL DEFAULT 'residential'");
     }
 };

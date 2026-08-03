@@ -12,7 +12,15 @@ class Conversation extends Model
     protected $fillable = [
         'subject',
         'property_id',
+        'client_id',
+        'agent_id',
+        'admin_id',
+        'status',
+        'type',
         'is_archived',
+        'last_message',
+        'last_message_at',
+        'closed_at',
     ];
 
     protected $casts = [
@@ -37,6 +45,21 @@ class Conversation extends Model
     public function property()
     {
         return $this->belongsTo(Property::class);
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(User::class, 'client_id');
+    }
+
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id');
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     public function scopeActive($query)
