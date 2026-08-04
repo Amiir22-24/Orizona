@@ -460,5 +460,27 @@ class AdminWebController extends Controller
         $roleLabel = $role === 'owner' ? 'Propriétaire' : ($role === 'agent' ? 'Agent' : ucfirst($role));
         return back()->with('success', "{$roleLabel} créé avec succès ! [Matricule : {$matricule}] [Email : {$user->email}] [Mot de passe : {$plainPassword}]. {$mailStatus}");
     }
+
+    /**
+     * Supprimer un utilisateur (Admin).
+     * DELETE /admin/users/{id}
+     */
+    public function destroyUser($id)
+    {
+        if ((int)$id === (int)Auth::id()) {
+            return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte administrateur.');
+        }
+
+        $user = User::findOrFail($id);
+        $name = $user->full_name;
+
+        // Supprimer les profils associés
+        $user->ownerProfile()?->delete();
+        $user->agentProfile()?->delete();
+
+        $user->delete();
+
+        return redirect()->route('admin.web.users')->with('success', "L'utilisateur \"{$name}\" a été supprimé avec succès.");
+    }
 }
 

@@ -102,7 +102,7 @@ class WebAuthController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
-        // Création de l'utilisateur
+        // Création de l'utilisateur (auto-validation pour les locataires/clients)
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name'  => $request->last_name,
@@ -110,7 +110,7 @@ class WebAuthController extends Controller
             'phone'      => $request->phone,
             'password'   => Hash::make($request->password),
             'user_type'  => $request->user_type,
-            'status'     => 'pending', // En attente de validation
+            'status'     => 'validated', // Profil automatiquement validé dès l'inscription
         ]);
 
         // Si propriétaire, créer le profil et générer le matricule

@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
         // Utilisateurs
         Route::get('/users', [AdminWebController::class, 'users'])->name('web.users');
         Route::get('/users/{id}', [AdminWebController::class, 'userDetail'])->name('web.user-detail');
+        Route::delete('/users/{id}', [AdminWebController::class, 'destroyUser'])->name('web.users.destroy');
         Route::post('/users/{id}/status', [AdminWebController::class, 'updateUserStatus'])->name('web.user-status');
         Route::post('/users/agents', [AdminWebController::class, 'storeAgent'])->name('web.users.agents.store');
         Route::post('/users/owners', [AdminWebController::class, 'storeOwner'])->name('web.users.owners.store');

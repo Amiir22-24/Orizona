@@ -34,8 +34,8 @@
             </div>
         </div>
 
-        <!-- Changement de statut -->
-        <div class="bg-white dark:bg-[#161615] border border-gray-200 dark:border-[#3E3E3A] rounded-xl p-4">
+        <!-- Changement de statut et Suppression -->
+        <div class="bg-white dark:bg-[#161615] border border-gray-200 dark:border-[#3E3E3A] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <form method="POST" action="{{ route('admin.web.user-status', $user->id) }}" class="flex flex-wrap items-center gap-3">
                 @csrf
                 <span class="text-xs font-bold text-[#706f6c] dark:text-[#A1A09A]">Changer le statut :</span>
@@ -50,6 +50,19 @@
                     Mettre à jour
                 </button>
             </form>
+
+            @if($user->id !== Auth::id())
+                <form action="{{ route('admin.web.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer définitivement l\'utilisateur {{ addslashes($user->full_name) }} ? Cette action est irréversible.');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Supprimer le compte
+                    </button>
+                </form>
+            @endif
         </div>
 
         <!-- Informations personnelles -->
