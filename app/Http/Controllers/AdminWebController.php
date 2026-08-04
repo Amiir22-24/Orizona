@@ -451,11 +451,14 @@ class AdminWebController extends Controller
 
         try {
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\UserRegisteredByAdminMail($user, $plainPassword));
+            $mailStatus = "Un email contenant ses accès lui a été envoyé.";
         } catch (\Exception $e) {
-            // Ignorer l'erreur d'email
+            \Illuminate\Support\Facades\Log::error("Erreur envoi email création compte: " . $e->getMessage());
+            $mailStatus = "Email d'accès non envoyé (vérifier la configuration SMTP).";
         }
 
-        return back()->with('success', ucfirst($role) . ' créé avec succès. L\'email a été envoyé.');
+        $roleLabel = $role === 'owner' ? 'Propriétaire' : ($role === 'agent' ? 'Agent' : ucfirst($role));
+        return back()->with('success', "{$roleLabel} créé avec succès ! [Matricule : {$matricule}] [Email : {$user->email}] [Mot de passe : {$plainPassword}]. {$mailStatus}");
     }
 }
 

@@ -110,7 +110,7 @@ class AdminController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|unique:users,phone',
-            'password' => 'required|string|min:6',
+            'password' => 'nullable|string|min:6',
             'owner_type' => 'nullable|in:individual,company',
             'company_name' => 'nullable|string|max:255',
         ]);
@@ -120,17 +120,18 @@ class AdminController extends Controller
         }
 
         $validated = $validator->validated();
+        $plainPassword = $validated['password'] ?? \Illuminate\Support\Str::random(10);
 
         $year = now()->format('Y');
-        $count = User::where('matricule', 'LIKE', "PROP-{$year}%")->count();
-        $matricule = "PROP-{$year}-" . str_pad($count + 1, 6, '0', STR_PAD_LEFT);
+        $count = User::where('matricule', 'LIKE', "OWN-{$year}%")->count();
+        $matricule = "OWN-{$year}-" . str_pad($count + 1, 6, '0', STR_PAD_LEFT);
 
         $owner = User::create([
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($plainPassword),
             'user_type' => 'owner',
             'status' => 'validated',
             'matricule' => $matricule,
@@ -143,10 +144,18 @@ class AdminController extends Controller
             'validation_status' => 'validated',
         ]);
 
+        try {
+            \Illuminate\Support\Facades\Mail::to($owner->email)->send(new \App\Mail\UserRegisteredByAdminMail($owner, $plainPassword));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Erreur envoi mail owner: " . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Propriétaire créé avec succès',
             'data' => UserResource::make($owner->load('ownerProfile')),
+            'generated_password' => $plainPassword,
+            'matricule' => $matricule,
         ], 201);
     }
 
@@ -173,7 +182,7 @@ class AdminController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|string|unique:users,phone',
-            'password' => 'required|string|min:6',
+            'password' => 'nullable|string|min:6',
         ]);
 
         if ($validator->fails()) {
@@ -181,6 +190,7 @@ class AdminController extends Controller
         }
 
         $validated = $validator->validated();
+        $plainPassword = $validated['password'] ?? \Illuminate\Support\Str::random(10);
 
         $year = now()->format('Y');
         $count = User::where('matricule', 'LIKE', "AGT-{$year}%")->count();
@@ -191,7 +201,7 @@ class AdminController extends Controller
             'last_name' => $validated['last_name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($plainPassword),
             'user_type' => 'agent',
             'status' => 'validated',
             'matricule' => $matricule,
@@ -211,10 +221,18 @@ class AdminController extends Controller
             'is_read' => false,
         ]);
 
+        try {
+            \Illuminate\Support\Facades\Mail::to($agent->email)->send(new \App\Mail\UserRegisteredByAdminMail($agent, $plainPassword));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Erreur envoi mail agent: " . $e->getMessage());
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Agent créé avec succès',
             'data' => UserResource::make($agent->load('agentProfile')),
+            'generated_password' => $plainPassword,
+            'matricule' => $matricule,
         ], 201);
     }
 
