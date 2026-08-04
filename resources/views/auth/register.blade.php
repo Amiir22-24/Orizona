@@ -59,26 +59,20 @@
             <form method="POST" action="{{ route('register') }}" class="space-y-6">
                 @csrf
 
-                <!-- Type d'utilisateur -->
-                <div class="space-y-3">
-                    <label class="block text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">
-                        Je suis
-                    </label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="relative flex flex-col items-center p-4 border-2 border-gray-200 dark:border-[#3E3E3A] rounded-xl cursor-pointer hover:border-[#f53003] transition-all duration-200 {{ old('user_type', 'user') === 'user' ? 'border-[#f53003] bg-orange-50 dark:bg-[#1D0002]' : '' }}">
-                            <input type="radio" name="user_type" value="user" class="sr-only" {{ old('user_type') === 'user' ? 'checked' : '' }} checked>
-                            <svg class="w-8 h-8 mb-2 text-[#706f6c] dark:text-[#A1A09A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            <span class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">Locataire</span>
-                        </label>
-                        <label class="relative flex flex-col items-center p-4 border-2 border-gray-200 dark:border-[#3E3E3A] rounded-xl cursor-pointer hover:border-[#f53003] transition-all duration-200 {{ old('user_type') === 'owner' ? 'border-[#f53003] bg-orange-50 dark:bg-[#1D0002]' : '' }}">
-                            <input type="radio" name="user_type" value="owner" class="sr-only" {{ old('user_type') === 'owner' ? 'checked' : '' }}>
-                            <svg class="w-8 h-8 mb-2 text-[#706f6c] dark:text-[#A1A09A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                            </svg>
-                            <span class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC]">Propriétaire</span>
-                        </label>
+                {{-- Type d'utilisateur : seul le rôle "Locataire" est disponible à l'auto-inscription --}}
+                {{-- Les agents et propriétaires sont inscrits exclusivement par l'administrateur --}}
+                <input type="hidden" name="user_type" value="user">
+
+                {{-- Notice informative --}}
+                <div class="flex items-start gap-3 p-4 bg-blue-50 dark:bg-[#001220] border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div>
+                        <p class="text-xs font-semibold text-blue-800 dark:text-blue-300">Inscription Locataire</p>
+                        <p class="text-xs text-blue-700 dark:text-blue-400 mt-0.5 leading-relaxed">
+                            Ce formulaire est réservé aux locataires. Les comptes <strong>Agent</strong> et <strong>Propriétaire</strong> sont créés uniquement par l'administrateur de la plateforme.
+                        </p>
                     </div>
                 </div>
 
