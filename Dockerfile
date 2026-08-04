@@ -54,4 +54,4 @@ EXPOSE ${PORT:-10000}
 #     - Exécute les migrations (--force requis en production)
 #     - Lance Apache en mode foreground (maintient le conteneur actif)
 #     Le "&&" garantit que le serveur ne démarre que si les migrations réussissent.
-CMD php artisan migrate --force && apache2-foreground
+CMD php artisan migrate --force && php artisan db:seed --class=AdminSeeder --force && apache2-foreground
