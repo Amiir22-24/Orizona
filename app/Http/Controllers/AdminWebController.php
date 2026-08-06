@@ -469,10 +469,10 @@ class AdminWebController extends Controller
 
         try {
             \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\UserRegisteredByAdminMail($user, $plainPassword));
-            $mailStatus = "Un email contenant ses accès lui a été envoyé.";
+            $mailStatus = "✅ Un e-mail contenant ses accès a été envoyé à {$user->email}.";
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("Erreur envoi email création compte: " . $e->getMessage());
-            $mailStatus = "Email d'accès non envoyé (vérifier la configuration SMTP).";
+            $mailStatus = "⚠️ E-mail non parti (Détail SMTP : " . $e->getMessage() . ").";
         }
 
         $roleLabel = $role === 'owner' ? 'Propriétaire' : ($role === 'agent' ? 'Agent' : ucfirst($role));
