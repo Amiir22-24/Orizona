@@ -123,8 +123,12 @@ class AdminController extends Controller
         $plainPassword = $validated['password'] ?? \Illuminate\Support\Str::random(10);
 
         $year = now()->format('Y');
-        $count = User::where('matricule', 'LIKE', "OWN-{$year}%")->count();
-        $matricule = "OWN-{$year}-" . str_pad($count + 1, 6, '0', STR_PAD_LEFT);
+        $number = User::withTrashed()->where('matricule', 'LIKE', "OWN-{$year}-%")->count() + 1;
+        do {
+            $matricule = "OWN-{$year}-" . str_pad($number, 6, '0', STR_PAD_LEFT);
+            $exists = User::withTrashed()->where('matricule', $matricule)->exists();
+            $number++;
+        } while ($exists);
 
         $owner = User::create([
             'first_name' => $validated['first_name'],
@@ -193,8 +197,12 @@ class AdminController extends Controller
         $plainPassword = $validated['password'] ?? \Illuminate\Support\Str::random(10);
 
         $year = now()->format('Y');
-        $count = User::where('matricule', 'LIKE', "AGT-{$year}%")->count();
-        $matricule = "AGT-{$year}-" . str_pad($count + 1, 6, '0', STR_PAD_LEFT);
+        $number = User::withTrashed()->where('matricule', 'LIKE', "AGT-{$year}-%")->count() + 1;
+        do {
+            $matricule = "AGT-{$year}-" . str_pad($number, 6, '0', STR_PAD_LEFT);
+            $exists = User::withTrashed()->where('matricule', $matricule)->exists();
+            $number++;
+        } while ($exists);
 
         $agent = User::create([
             'first_name' => $validated['first_name'],

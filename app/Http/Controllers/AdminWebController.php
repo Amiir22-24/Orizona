@@ -431,8 +431,13 @@ class AdminWebController extends Controller
         $plainPassword = \Illuminate\Support\Str::random(10);
         $matriculePrefix = $role === 'owner' ? 'OWN' : 'AGT';
         $year = now()->format('Y');
-        $count = User::where('matricule', 'LIKE', "{$matriculePrefix}-{$year}%")->count();
-        $matricule = "{$matriculePrefix}-{$year}-" . str_pad($count + 1, 6, '0', STR_PAD_LEFT);
+
+        $number = User::withTrashed()->where('matricule', 'LIKE', "{$matriculePrefix}-{$year}-%")->count() + 1;
+        do {
+            $matricule = "{$matriculePrefix}-{$year}-" . str_pad($number, 6, '0', STR_PAD_LEFT);
+            $exists = User::withTrashed()->where('matricule', $matricule)->exists();
+            $number++;
+        } while ($exists);
 
         $user = User::create([
             'first_name' => $request->first_name,
