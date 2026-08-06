@@ -459,10 +459,11 @@ class AdminWebController extends Controller
             ]);
         } elseif ($role === 'agent') {
             \App\Models\AgentProfile::create([
-                'user_id'           => $user->id,
-                'agency_name'       => 'Orizona',
-                'is_active'         => true,
-                'validation_status' => 'validated',
+                'user_id'             => $user->id,
+                'registration_number' => $matricule,
+                'agency_name'         => 'Orizona',
+                'is_active'           => true,
+                'validation_status'   => 'validated',
             ]);
         }
 
