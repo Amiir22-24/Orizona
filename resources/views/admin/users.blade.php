@@ -139,20 +139,20 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-[#706f6c] dark:text-[#A1A09A] mb-1">Prénom</label>
-                            <input type="text" name="first_name" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
+                            <input type="text" name="first_name" value="{{ old('first_name') }}" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-[#706f6c] dark:text-[#A1A09A] mb-1">Nom</label>
-                            <input type="text" name="last_name" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
+                            <input type="text" name="last_name" value="{{ old('last_name') }}" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-[#706f6c] dark:text-[#A1A09A] mb-1">Email</label>
-                        <input type="email" name="email" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
+                        <input type="email" name="email" value="{{ old('email') }}" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-[#706f6c] dark:text-[#A1A09A] mb-1">Téléphone</label>
-                        <input type="text" name="phone" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
+                        <input type="text" name="phone" value="{{ old('phone') }}" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
                     </div>
                     <button type="submit" class="w-full py-2.5 text-sm font-bold text-white bg-[#f53003] hover:bg-orange-600 rounded-lg transition-all">
                         Inscrire l'Agent
@@ -169,20 +169,20 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-[#706f6c] dark:text-[#A1A09A] mb-1">Prénom</label>
-                            <input type="text" name="first_name" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
+                            <input type="text" name="first_name" value="{{ old('first_name') }}" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-[#706f6c] dark:text-[#A1A09A] mb-1">Nom</label>
-                            <input type="text" name="last_name" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
+                            <input type="text" name="last_name" value="{{ old('last_name') }}" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-[#706f6c] dark:text-[#A1A09A] mb-1">Email</label>
-                        <input type="email" name="email" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
+                        <input type="email" name="email" value="{{ old('email') }}" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-[#706f6c] dark:text-[#A1A09A] mb-1">Téléphone</label>
-                        <input type="text" name="phone" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
+                        <input type="text" name="phone" value="{{ old('phone') }}" required class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-[#3E3E3A] bg-gray-50 dark:bg-[#1a1a18] text-[#1b1b18] dark:text-[#EDEDEC]">
                     </div>
                     <button type="submit" class="w-full py-2.5 text-sm font-bold text-white bg-[#1b1b18] dark:bg-white dark:text-[#1b1b18] hover:bg-gray-800 dark:hover:bg-gray-200 rounded-lg transition-all">
                         Inscrire le Propriétaire

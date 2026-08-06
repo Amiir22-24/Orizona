@@ -409,12 +409,24 @@ class AdminWebController extends Controller
 
     private function storeUserByAdmin(Request $request, $role)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
             'email'      => 'required|email|unique:users,email',
             'phone'      => 'required|string|unique:users,phone|max:30',
+        ], [
+            'first_name.required' => 'Le prénom est obligatoire.',
+            'last_name.required'  => 'Le nom est obligatoire.',
+            'email.required'      => 'L\'adresse email est obligatoire.',
+            'email.email'         => 'L\'adresse email n\'est pas valide.',
+            'email.unique'        => 'Cet email est déjà utilisé par un autre utilisateur.',
+            'phone.required'      => 'Le numéro de téléphone est obligatoire.',
+            'phone.unique'        => 'Ce numéro de téléphone est déjà utilisé par un autre utilisateur.',
         ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
 
         $plainPassword = \Illuminate\Support\Str::random(10);
         $matriculePrefix = $role === 'owner' ? 'OWN' : 'AGT';

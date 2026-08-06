@@ -230,6 +230,22 @@
             </div>
         @endif
 
+        @if ($errors->any())
+            <div class="mb-4 p-4 bg-red-50 dark:bg-[#1D0002] border border-red-300 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
+                <div class="font-bold mb-1 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Erreur de saisie :
+                </div>
+                <ul class="list-disc list-inside space-y-1 text-xs">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @if(Auth::check() && Auth::user()->user_type === 'admin')
             {{-- Sous-menu Admin (Desktop) — caché sur mobile (remplacé par le panneau coulissant) --}}
             <nav class="mb-6 hidden sm:flex flex-wrap items-center gap-2 pb-4 border-b border-gray-200 dark:border-[#3E3E3A]">
